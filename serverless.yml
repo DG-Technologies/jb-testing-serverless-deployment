@@ -1,0 +1,140 @@
+service: JB-Test
+
+provider:
+  name: aws
+  runtime: python3.10
+  stage: dev
+  region: us-east-2
+  apiName: JB-Test-api
+  timeout: 10
+  versionFunctions: false
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - lambda:InvokeFunction
+            - lambda:InvokeAsync
+          Resource: "*"
+
+package:
+  patterns:
+    - "!node_modules/aws-sdk"  # Exclude AWS SDK (already available in Lambda runtime)
+    - "!node_modules/**"       # Exclude all node modules
+    - "!unit_tests/**"         # Exclude tests
+    - "!integration_tests/**"  # Exclude integration tests
+    - "!.cache/**"             # Exclude cache files
+    - "!.git/**"               # Exclude git files
+    - "!README.md"             # Exclude readme
+    - "!.serverless/**"        # Exclude serverless cache
+
+
+functions:
+
+  helloWorld:
+    iamRoleStatementsInherit: true
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - lambda:InvokeFunction
+        Resource:
+          - "*"
+    handler: hello_world.hello_world
+    events:
+      - http:
+          path: hi
+          method: get
+          private: false
+          cors:
+            origin: "*"
+            headers: ${self:custom.allowed-headers}
+            allowCredentials: true
+
+  
+
+# you can add CloudFormation resource templates here
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: "AWS::ApiGateway::GatewayResponse"
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'*'"
+          gatewayresponse.header.Vary: "'*'"
+          gatewayresponse.header.Access-Control-Expose-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: "ApiGatewayRestApi"
+    GatewayResponseDefault5XX:
+      Type: "AWS::ApiGateway::GatewayResponse"
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'*'"
+          gatewayresponse.header.Vary: "'*'"
+          gatewayresponse.header.Access-Control-Expose-Headers: "'*'"
+        ResponseType: DEFAULT_5XX
+        RestApiId:
+          Ref: "ApiGatewayRestApi"
+    ApiGatewayAuthorizer:
+      Type: "AWS::ApiGateway::Authorizer"
+      Properties:
+        AuthorizerResultTtlInSeconds: 300
+        Name: API_AUTH_cognito_authorizer
+        IdentitySource: method.request.header.Authorization
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        Type: COGNITO_USER_POOLS
+        ProviderARNs:
+          - arn:aws:cognito-idp:us-east-1:344017631564:userpool/us-east-1_qNefyX37O
+
+plugins:
+  - serverless-python-requirements
+  - serverless-iam-roles-per-function
+  - serverless-prune-versions
+
+custom:
+  serverless-iam-roles-per-function:
+    defaultInherit: true
+  pool: arn:aws:cognito-idp:us-east-1:344017631564:userpool/us-east-1_qNefyX37O
+
+
+
+  pythonRequirements:
+    zip: false
+    slim: true
+    strip: true
+    pipCmdExtraArgs: 
+      - '--only-binary=:all:'
+    noDeploy:
+      - boto3
+      - botocore
+      - s3transfer
+      - six
+      - dateutil
+      - jmespath
+
+
+  allowed-headers:
+    - Content-Type
+    - X-Amz-Date
+    - Authorization
+    - X-Api-Key
+    - Vary
+    - X-Amz-Security-Token
+    - Origin
+    - x-requested-with
+    - Access-Control-Allow-Origin
+    - Access-Control-Allow-Headers
+    - Access-Control-Allow-Methods
+    - Access-Control-Request-Headers
+    - Access-Control-Request-Method
+    - Access-Control-Expose-Headers
+
+  prune:
+    automatic: true
+    includeLayers: true
+    number: 3
