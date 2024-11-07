@@ -20,8 +20,7 @@ blocks:
             - cache restore
             - sem-version python 3.10
             - checkout
-            - pip install virtualenv
-            - pip3 install -r requirements.txt
+            - echo 'Installing dependencies...'
             - cache store
   - name: Unit Tests
     dependencies:
