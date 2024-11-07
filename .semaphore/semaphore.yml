@@ -45,6 +45,7 @@ blocks:
             - ls -la
             - npm install -g serverless
             - serverless --version
+            - serverless login
             - npm install serverless-python-individually
             - npm install serverless-prune-versions -D
             - sls plugin install -n serverless-python-requirements
