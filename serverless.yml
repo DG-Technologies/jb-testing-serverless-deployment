@@ -50,6 +50,24 @@ functions:
             headers: ${self:custom.allowed-headers}
             allowCredentials: true
 
+  holaMundo:
+    iamRoleStatementsInherit: true
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - lambda:InvokeFunction
+        Resource:
+          - "*"
+    handler: hola_mundo.hola_mundo
+    events:
+      - http:
+          path: hola
+          method: get
+          private: false
+          cors:
+            origin: "*"
+            headers: ${self:custom.allowed-headers}
+            allowCredentials: true
   
 
 # you can add CloudFormation resource templates here
