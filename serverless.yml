@@ -8,6 +8,8 @@ provider:
   region: us-east-2
   apiName: JB-Test-api
   timeout: 10
+  org: dgcloud
+  app: test-one
   versionFunctions: false
   iam:
     role:
