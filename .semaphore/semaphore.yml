@@ -36,7 +36,7 @@ blocks:
     task:
       secrets:
         - name: jb_AWS_test
-        - name: jdaily on AWS
+        # - name: jdaily on AWS
         - name: SERVERLESS_ACCESS_KEY
       jobs:
         - name: Deploy Serverless to Dev
@@ -52,7 +52,7 @@ blocks:
             - npm install serverless-prune-versions -D
             - sls plugin install -n serverless-python-requirements
             - sls plugin install -n serverless-iam-roles-per-function
-            - sls deploy --verbose --stage dev --region us-east-2
+            - sls deploy --verbose --debug --stage dev --region us-east-2
             - cache
   - name: Test Integration
     dependencies:
