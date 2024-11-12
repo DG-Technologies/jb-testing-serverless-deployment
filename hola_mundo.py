@@ -1,6 +1,7 @@
 # HolaMundo.py
 
-def hola_mundo():
+def hola_mundo(event, context):
+    
     print('Hola Mundo')
 
     body = {'message': 'Hola Mundo'}

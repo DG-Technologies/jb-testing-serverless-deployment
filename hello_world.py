@@ -1,6 +1,6 @@
 # HelloWorld.py
 
-def hello_world():
+def hello_world(event, context):
     print('Hello, World!')
 
     body = {'message': 'Hello, World!'}
