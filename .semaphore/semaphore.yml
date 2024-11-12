@@ -36,6 +36,7 @@ blocks:
     task:
       secrets:
         - name: jb_AWS_test
+        - name: jdaily on AWS
         - name: SERVERLESS_ACCESS_KEY
       jobs:
         - name: Deploy Serverless to Dev
